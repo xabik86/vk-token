@@ -13,38 +13,46 @@
         #token-display { margin-top: 25px; padding: 15px; border: 1px solid #ccc; background: #f0f0f0; word-break: break-all; max-width: 500px; text-align: left; border-radius: 8px; }
         #token-display:empty { display: none; }
         .success-text { font-weight: bold; margin-bottom: 10px; color: #2a7d2a; }
+        .error-text { font-weight: bold; margin-bottom: 10px; color: #d92d2d; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Получение токена для SMM Ассистента</h1>
-        <button onclick="getToken()">Нажать, чтобы получить токен</button>
+        <button id="getTokenBtn">Нажать, чтобы получить токен</button>
         <div id="token-display"></div>
     </div>
 
     <script>
-        // Инициализируем VK Bridge
-        vkBridge.send('VKWebAppInit', {});
+        // Убедимся, что VK Bridge доступен
+        if (window.vkBridge && vkBridge.supports('VKWebAppInit')) {
+            vkBridge.send('VKWebAppInit', {});
+        } else {
+             document.getElementById('token-display').innerHTML = '<div class="error-text">Ошибка: VK Bridge не загрузился.</div>';
+        }
 
-        function getToken() {
+        // Навешиваем событие на кнопку
+        document.getElementById('getTokenBtn').addEventListener('click', function() {
+            const APP_ID = 53966261; // ВАШ ID ПРИЛОЖЕНИЯ
+
             vkBridge.send('VKWebAppGetAuthToken', {
-                app_id: 53966261, // <-- ВАШ ПРАВИЛЬНЫЙ ID УЖЕ ЗДЕСЬ
+                app_id: APP_ID,
                 scope: 'friends,messages,wall,photos,offline'
             })
             .then(data => {
                 if (data.access_token) {
                     const tokenDisplay = document.getElementById('token-display');
                     tokenDisplay.innerHTML = '<div class="success-text">УСПЕХ! Скопируйте этот токен и отправьте администратору:</div>' + data.access_token;
-                    document.querySelector('button').style.display = 'none';
+                    document.getElementById('getTokenBtn').style.display = 'none';
                 }
             })
             .catch(error => {
-                // Обработка ошибок для отладки
-                console.error(error);
+                console.error('VK Bridge Error:', error);
                 const tokenDisplay = document.getElementById('token-display');
-                tokenDisplay.innerHTML = '<div style="color: red;"><strong>Ошибка:</strong> ' + (error.error_data ? error.error_data.error_reason : 'Неизвестная ошибка') + '</div>';
+                // Выводим ошибку прямо на страницу
+                tokenDisplay.innerHTML = '<div class="error-text">Произошла ошибка:</div>' + (error.error_data ? JSON.stringify(error.error_data) : 'Неизвестная ошибка. Откройте консоль (F12) для деталей.');
             });
-        }
+        });
     </script>
 </body>
 </html>
