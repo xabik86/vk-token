@@ -8,7 +8,7 @@
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; flex-direction: column; text-align: center; background-color: #f0f2f5; }
         .container { padding: 40px; background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         button { font-size: 1.2em; padding: 12px 24px; cursor: pointer; color: white; background-color: #0077ff; border: none; border-radius: 8px; }
-        #token-display { margin-top: 25px; padding: 15px; border: 1px solid #ccc; background: #f0f0f0; word-break: break-all; max-width: 500px; text-align: left; border-radius: 8px; }
+        #token-display { margin-top: 25px; padding: 15px; border: 1px solid #ccc; background: #f0f0f0; word-break: break-all; max-width: 90%; text-align: left; border-radius: 8px; }
         #token-display:empty { display: none; }
         .success-text { font-weight: bold; margin-bottom: 10px; color: #2a7d2a; }
     </style>
@@ -16,7 +16,6 @@
 <body>
     <div class="container">
         <h1>Получение токена для SMM Ассистента</h1>
-        <!-- Прямой вызов функции getToken() при клике -->
         <button onclick="getToken()">Нажать, чтобы получить токен</button>
         <div id="token-display"></div>
     </div>
@@ -26,14 +25,11 @@
         vkBridge.send('VKWebAppInit');
 
         function getToken() {
-            console.log('Кнопка нажата! Запрашиваю токен...'); // Диагностическое сообщение
-
             vkBridge.send('VKWebAppGetAuthToken', {
                 app_id: 53966286, // ВАШ ID
                 scope: 'friends,messages,wall,photos,offline'
             })
             .then(data => {
-                console.log('Ответ от VK Bridge получен:', data); // Диагностическое сообщение
                 if (data.access_token) {
                     const tokenDisplay = document.getElementById('token-display');
                     tokenDisplay.innerHTML = '<div class="success-text">УСПЕХ! Скопируйте этот токен:</div>' + data.access_token;
@@ -41,19 +37,12 @@
                 }
             })
             .catch(error => {
-                console.error('Ошибка VK Bridge:', error); // Диагностическое сообщение
+                console.error('Ошибка VK Bridge:', error);
+                // Выводим ошибку на страницу, чтобы было видно на телефоне
+                const tokenDisplay = document.getElementById('token-display');
+                tokenDisplay.textContent = 'Произошла ошибка: ' + JSON.stringify(error);
             });
         }
     </script>
 </body>
-</html>```
-
-#### **Шаг 2: Отправьте обновление на GitHub**
-
-1.  Сохраните новый `index.html`.
-2.  Отправьте его на GitHub:
-    ```bash
-    git add .
-    git commit -m "Упростил код кнопки для надежности"
-    git push
-    ```
+</html>
