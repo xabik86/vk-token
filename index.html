@@ -7,56 +7,53 @@
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; flex-direction: column; text-align: center; background-color: #f0f2f5; }
         .container { padding: 40px; background-color: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { color: #333; }
-        button { font-size: 1.2em; padding: 12px 24px; cursor: pointer; color: white; background-color: #0077ff; border: none; border-radius: 8px; transition: background-color 0.2s; }
-        button:hover { background-color: #005dcc; }
+        button { font-size: 1.2em; padding: 12px 24px; cursor: pointer; color: white; background-color: #0077ff; border: none; border-radius: 8px; }
         #token-display { margin-top: 25px; padding: 15px; border: 1px solid #ccc; background: #f0f0f0; word-break: break-all; max-width: 500px; text-align: left; border-radius: 8px; }
         #token-display:empty { display: none; }
         .success-text { font-weight: bold; margin-bottom: 10px; color: #2a7d2a; }
-        .error-text { font-weight: bold; margin-bottom: 10px; color: #d92d2d; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Получение токена для SMM Ассистента</h1>
-        <button id="getTokenBtn">Нажать, чтобы получить токен</button>
+        <!-- Прямой вызов функции getToken() при клике -->
+        <button onclick="getToken()">Нажать, чтобы получить токен</button>
         <div id="token-display"></div>
     </div>
 
     <script>
-        // Убедимся, что VK Bridge доступен
-        if (window.vkBridge && vkBridge.supports('VKWebAppInit')) {
-            vkBridge.send('VKWebAppInit', {});
-        } else {
-             document.getElementById('token-display').innerHTML = '<div class="error-text">Ошибка: VK Bridge не загрузился.</div>';
-        }
+        // Инициализируем VK Bridge сразу
+        vkBridge.send('VKWebAppInit');
 
-        // Навешиваем событие на кнопку
-        document.getElementById('getTokenBtn').addEventListener('click', function() {
-            // ID вашего Mini App
-            const APP_ID = 53966286; 
+        function getToken() {
+            console.log('Кнопка нажата! Запрашиваю токен...'); // Диагностическое сообщение
 
             vkBridge.send('VKWebAppGetAuthToken', {
-                app_id: APP_ID,
+                app_id: 53966286, // ВАШ ID
                 scope: 'friends,messages,wall,photos,offline'
             })
             .then(data => {
+                console.log('Ответ от VK Bridge получен:', data); // Диагностическое сообщение
                 if (data.access_token) {
                     const tokenDisplay = document.getElementById('token-display');
-                    tokenDisplay.innerHTML = '<div class="success-text">УСПЕХ! Скопируйте этот токен и отправьте администратору:</div>' + data.access_token;
-                    document.getElementById('getTokenBtn').style.display = 'none';
-                } else if (data.error_type) {
-                     const tokenDisplay = document.getElementById('token-display');
-                     tokenDisplay.innerHTML = '<div class="error-text">Произошла ошибка VK Bridge:</div>' + JSON.stringify(data);
+                    tokenDisplay.innerHTML = '<div class="success-text">УСПЕХ! Скопируйте этот токен:</div>' + data.access_token;
+                    document.querySelector('button').style.display = 'none';
                 }
             })
             .catch(error => {
-                console.error('VK Bridge Error:', error);
-                const tokenDisplay = document.getElementById('token-display');
-                // Выводим ошибку прямо на страницу
-                tokenDisplay.innerHTML = '<div class="error-text">Произошла ошибка:</div>' + (error.error_data ? JSON.stringify(error.error_data) : 'Неизвестная ошибка. Откройте консоль (F12) для деталей.');
+                console.error('Ошибка VK Bridge:', error); // Диагностическое сообщение
             });
-        });
+        }
     </script>
 </body>
-</html>
+</html>```
+
+#### **Шаг 2: Отправьте обновление на GitHub**
+
+1.  Сохраните новый `index.html`.
+2.  Отправьте его на GitHub:
+    ```bash
+    git add .
+    git commit -m "Упростил код кнопки для надежности"
+    git push
+    ```
