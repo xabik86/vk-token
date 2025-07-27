@@ -23,11 +23,12 @@
     </div>
 
     <script>
-        vkBridge.send('VKWebAppInit');
+        // Инициализируем VK Bridge
+        vkBridge.send('VKWebAppInit', {});
 
         function getToken() {
             vkBridge.send('VKWebAppGetAuthToken', {
-                app_id: 53966261, // <-- ЗАМЕНИТЕ ЭТО НА ВАШ НОВЫЙ ID
+                app_id: 53966261, // <-- ВАШ ПРАВИЛЬНЫЙ ID УЖЕ ЗДЕСЬ
                 scope: 'friends,messages,wall,photos,offline'
             })
             .then(data => {
@@ -38,8 +39,10 @@
                 }
             })
             .catch(error => {
+                // Обработка ошибок для отладки
                 console.error(error);
-                alert('Произошла ошибка. Подробности можно посмотреть в консоли разработчика (F12).');
+                const tokenDisplay = document.getElementById('token-display');
+                tokenDisplay.innerHTML = '<div style="color: red;"><strong>Ошибка:</strong> ' + (error.error_data ? error.error_data.error_reason : 'Неизвестная ошибка') + '</div>';
             });
         }
     </script>
