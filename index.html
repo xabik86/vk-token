@@ -33,7 +33,8 @@
 
         // Навешиваем событие на кнопку
         document.getElementById('getTokenBtn').addEventListener('click', function() {
-            const APP_ID = 53966286; // ВАШ ID ПРИЛОЖЕНИЯ
+            // ID вашего Mini App
+            const APP_ID = 53966286; 
 
             vkBridge.send('VKWebAppGetAuthToken', {
                 app_id: APP_ID,
@@ -44,6 +45,9 @@
                     const tokenDisplay = document.getElementById('token-display');
                     tokenDisplay.innerHTML = '<div class="success-text">УСПЕХ! Скопируйте этот токен и отправьте администратору:</div>' + data.access_token;
                     document.getElementById('getTokenBtn').style.display = 'none';
+                } else if (data.error_type) {
+                     const tokenDisplay = document.getElementById('token-display');
+                     tokenDisplay.innerHTML = '<div class="error-text">Произошла ошибка VK Bridge:</div>' + JSON.stringify(data);
                 }
             })
             .catch(error => {
